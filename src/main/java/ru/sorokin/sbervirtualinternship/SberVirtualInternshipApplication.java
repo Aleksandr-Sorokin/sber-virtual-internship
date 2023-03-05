@@ -1,7 +1,8 @@
 package ru.sorokin.sbervirtualinternship;
 
+import ru.sorokin.sbervirtualinternship.enums.TypeSortCity;
 import ru.sorokin.sbervirtualinternship.model.City;
-import ru.sorokin.sbervirtualinternship.service.ReadFiles;
+import ru.sorokin.sbervirtualinternship.service.CityService;
 
 import java.io.File;
 import java.util.List;
@@ -9,15 +10,19 @@ import java.util.List;
 public class SberVirtualInternshipApplication {
 
     public static void main(String[] args) {
-        ReadFiles readFiles = new ReadFiles();
-        List<String> stringList = readFiles.getLinesFromFile(new File("Задача ВС Java Сбер.csv"));
-        stringList.stream().map(s -> {
-            String[] d = s.split(";");
-            if (d.length < 6) {
-                return new City(Integer.valueOf(d[0]), d[1], d[2], d[3], Integer.valueOf(d[4]), "");
-            } else {
-                return new City(Integer.valueOf(d[0]), d[1], d[2], d[3], Integer.valueOf(d[4]), d[5]);
+        TypeSortCity typeSort = TypeSortCity.DESC_NAME_CASE_INSENSITIVE;
+        if (args.length > 0) {
+            if (TypeSortCity.DESC_NAME_CASE_INSENSITIVE.equals(TypeSortCity.valueOf(args[0])) ||
+                    TypeSortCity.DESC_DISTRICT_CASE_SENSITIVE.equals(TypeSortCity.valueOf(args[0]))) {
+                typeSort = TypeSortCity.valueOf(args[0]);
             }
-        }).forEach(System.out::println);
+        }
+
+        File file = new File("Задача ВС Java Сбер.csv");
+        CityService cityService = new CityService();
+        List<City> cities = cityService.createListCity(file, typeSort);
+        for (City city : cities) {
+            System.out.println(city);
+        }
     }
 }
